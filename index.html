@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roblox Server Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      color: #00ccff;
+    }
+    #serverList {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .server {
+      background: #1a1a1a;
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      box-shadow: 0 0 10px #000;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #ccc;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Roblox Servers</h1>
+  <div id="serverList">Loading...</div>
+
+  <script>
+    async function fetchData() {
+      try {
+        const res = await fetch("https://render-source-2vhx.onrender.com/data.json");
+        const data = await res.json();
+
+        const container = document.getElementById("serverList");
+        container.innerHTML = "";
+
+        const keys = Object.keys(data);
+        if (keys.length === 0) {
+          container.textContent = "No server data available.";
+          return;
+        }
+
+        keys.forEach((key) => {
+          const server = data[key];
+          const el = document.createElement("div");
+          el.className = "server";
+          el.innerHTML = `
+            <div>
+              <strong>${key}</strong>
+              <div class="timestamp">${server.timestamp}</div>
+            </div>
+            <div><strong>${server.count}</strong> players</div>
+          `;
+          container.appendChild(el);
+        });
+      } catch (err) {
+        document.getElementById("serverList").textContent = "Error fetching data.";
+        console.error(err);
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000); // update every 10 seconds
+  </script>
+</body>
+</html>
